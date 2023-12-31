@@ -13,7 +13,7 @@ datasource db {
 model User {
   username    String   @id @unique @db.VarChar(64)
   isAdmin     Boolean  @default(false) @map("is_admin")
-  dateCreated DateTime @default(now()) @map("date_created")
+  createdAt   DateTime @default(now()) @map("created_at")
   email       String?  @unique @db.VarChar(55)
   firstName   String   @map("first_name") @db.VarChar(35)
   lastName    String   @map("last_name") @db.VarChar(35)
@@ -21,13 +21,32 @@ model User {
   password    String
   phoneNumber String?  @unique @map("phone_number") @db.VarChar(10)
   profile     Profile?
+  matches     Match[]
+  events      Event[]
 }
 
 model Profile {
-  username String   @id
-  user     User     @relation(fields: [username], references: [username])
+  username String   @id @db.VarChar(64)
+  user     User     @relation(fields: [username], references: [username], onDelete: Cascade, onUpdate: Cascade)
   age      Int
   bio      String   @db.VarChar(250)
   gender   String   @db.VarChar(20)
-  traits   String[]
+  traits   String[] @db.VarChar(64)
+}
+
+model Match {
+  username String @unique @db.VarChar(64)
+  user     User   @relation(fields: [username], references: [username])
+}
+
+model Event {
+  id           String   @id @default(uuid())
+  title        String   @db.VarChar(50)
+  dateTime     DateTime @map("date_time")
+  createdAt    DateTime @default(now()) @map("created_at")
+  description  String   @db.VarChar(250)
+  payment      Int?
+  host         User     @relation(fields: [hostUsername], references: [username])
+  hostUsername String   @db.VarChar(64)
+  type         String[] @db.VarChar(64)
 }
