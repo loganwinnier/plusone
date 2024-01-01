@@ -13,6 +13,9 @@ const usersRoutes = require("./routes/users");
 
 const morgan = require("morgan");
 
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
 const app = express();
 
 app.use(cors());
@@ -42,4 +45,4 @@ app.use(function (err, req, res, next) {
     });
 });
 
-module.exports = { app };
+module.exports = { app, prisma };

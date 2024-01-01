@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -20,23 +17,31 @@ model User {
   lastLogin   DateTime @default(now()) @map("last_login")
   password    String
   phoneNumber String?  @unique @map("phone_number") @db.VarChar(10)
-  profile     Profile?
-  matches     Match[]
   events      Event[]
+  matches     Match?
+  profile     Profile?
+
+  @@map("users")
 }
 
 model Profile {
   username String   @id @db.VarChar(64)
-  user     User     @relation(fields: [username], references: [username], onDelete: Cascade, onUpdate: Cascade)
   age      Int
   bio      String   @db.VarChar(250)
   gender   String   @db.VarChar(20)
   traits   String[] @db.VarChar(64)
+  user     User     @relation(fields: [username], references: [username], onDelete: Cascade)
+
+  @@map("profiles")
 }
 
 model Match {
   username String @unique @db.VarChar(64)
-  user     User   @relation(fields: [username], references: [username])
+  eventId  String
+  event    Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user     User   @relation(fields: [username], references: [username], onDelete: Cascade)
+
+  @@map("matches")
 }
 
 model Event {
@@ -46,7 +51,10 @@ model Event {
   createdAt    DateTime @default(now()) @map("created_at")
   description  String   @db.VarChar(250)
   payment      Int?
-  host         User     @relation(fields: [hostUsername], references: [username])
   hostUsername String   @db.VarChar(64)
   type         String[] @db.VarChar(64)
+  host         User     @relation(fields: [hostUsername], references: [username], onDelete: Cascade)
+  Match        Match[]
+
+  @@map("events")
 }
