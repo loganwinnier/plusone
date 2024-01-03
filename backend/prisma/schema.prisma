@@ -8,53 +8,53 @@ datasource db {
 }
 
 model User {
-  username    String   @id @unique @db.VarChar(64)
   isAdmin     Boolean  @default(false) @map("is_admin")
   createdAt   DateTime @default(now()) @map("created_at")
-  email       String?  @unique @db.VarChar(55)
+  email       String   @id @unique @db.VarChar(64)
   firstName   String   @map("first_name") @db.VarChar(35)
   lastName    String   @map("last_name") @db.VarChar(35)
   lastLogin   DateTime @default(now()) @map("last_login")
   password    String
   phoneNumber String?  @unique @map("phone_number") @db.VarChar(10)
   events      Event[]
-  matches     Match?
+  matches     Match[]
   profile     Profile?
 
   @@map("users")
 }
 
 model Profile {
-  username String   @id @db.VarChar(64)
-  age      Int
-  bio      String   @db.VarChar(250)
-  gender   String   @db.VarChar(20)
-  traits   String[] @db.VarChar(64)
-  user     User     @relation(fields: [username], references: [username], onDelete: Cascade)
+  email  String   @id @db.VarChar(64)
+  age    Int
+  bio    String   @db.VarChar(250)
+  gender String   @db.VarChar(20)
+  traits String[] @db.VarChar(64)
+  user   User     @relation(fields: [email], references: [email], onDelete: Cascade)
 
   @@map("profiles")
 }
 
 model Match {
-  username String @unique @db.VarChar(64)
-  eventId  String
-  event    Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  user     User   @relation(fields: [username], references: [username], onDelete: Cascade)
+  userEmail String @db.VarChar(64)
+  eventId   String
+  event     Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
 
+  @@id([userEmail, eventId])
   @@map("matches")
 }
 
 model Event {
-  id           String   @id @default(uuid())
-  title        String   @db.VarChar(50)
-  dateTime     DateTime @map("date_time")
-  createdAt    DateTime @default(now()) @map("created_at")
-  description  String   @db.VarChar(250)
-  payment      Int?
-  hostUsername String   @db.VarChar(64)
-  type         String[] @db.VarChar(64)
-  host         User     @relation(fields: [hostUsername], references: [username], onDelete: Cascade)
-  Match        Match[]
+  id          String   @id @default(uuid())
+  title       String   @db.VarChar(50)
+  dateTime    DateTime @map("date_time")
+  createdAt   DateTime @default(now()) @map("created_at")
+  description String   @db.VarChar(250)
+  payment     Int?
+  hostEmail   String   @map("host_email") @db.VarChar(64)
+  type        String[] @db.VarChar(64)
+  host        User     @relation(fields: [hostEmail], references: [email], onDelete: Cascade)
+  Match       Match[]
 
   @@map("events")
 }

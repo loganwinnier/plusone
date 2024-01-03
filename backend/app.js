@@ -24,9 +24,8 @@ app.use(morgan("tiny"));
 app.use(authenticateJWT);
 
 app.use("/auth", authRoutes);
-app.use("/companies", companiesRoutes);
 app.use("/users", usersRoutes);
-app.use("/jobs", jobsRoutes);
+
 
 
 /** Handle 404 errors -- this matches everything */
@@ -45,4 +44,4 @@ app.use(function (err, req, res, next) {
     });
 });
 
-module.exports = { app, prisma };
+module.exports = { app };

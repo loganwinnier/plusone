@@ -6,18 +6,42 @@ const express = require("express");
 const router = new express.Router();
 const { createToken } = require("../helpers/tokens");
 const { BadRequestError } = require("../expressError");
-
-/** POST /auth/token:  { username, password } => { token }
+const { PrismaClient: prisma } = require("../server");
+/** POST /auth/login:  { username, password } => { token }
  *
  * Returns JWT token which can be used to authenticate further requests.
  *
  * Authorization required: none
  */
 
-router.post("/token", async function (req, res, next) {
+router.post("/login", async function (req, res, next) {
+    user = await prisma.user.findUniqueOrThrow({
+        where: {
+            select: {
+                phoneNumber: true,
+                email: true
+            },
+            include: {
+                password: true,
+                firstName: true,
+                lastName: true,
+                events: true,
+                matches: true,
+                profile: true
+            }
+        }
+    }).catch((err) => {
+        console.error("failed to find user");
+        return res.json({
+            error: {
+                message: `Unable to find user ${ req.username }`,
+                status: 400
+            }
+        });
+    });
 
-    const { username, password } = req.body;
-    const user = await User.authenticate(username, password);
+
+    const user = await User.authenticate(user.email, user.password);
     const token = createToken(user);
     return res.json({ token });
 });

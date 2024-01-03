@@ -100,3 +100,6 @@ ALTER TABLE "matches" ADD CONSTRAINT "matches_username_fkey" FOREIGN KEY ("usern
 
 -- AddForeignKey
 ALTER TABLE "events" ADD CONSTRAINT "events_hostUsername_fkey" FOREIGN KEY ("hostUsername") REFERENCES "users"("username") ON DELETE CASCADE ON UPDATE CASCADE;
+
+--CreateCheckConstraint --Added Manually
+ALTER TABLE "users" ADD CHECK ("email" IS NOT NULL OR "phone_number" IS NOT NULL)
