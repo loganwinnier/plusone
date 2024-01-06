@@ -6,6 +6,7 @@ const express = require("express");
 const router = new express.Router();
 const Auth = require("../helpers/auth");
 const { BadRequestError } = require("../expressError");
+const { validateRegister, validateLogin } = require("../middleware/validation");
 
 /** POST /auth/login:  {login , password } => { token }
  * 
@@ -17,7 +18,9 @@ const { BadRequestError } = require("../expressError");
  * Authorization required: none
  */
 
-router.post("/login", async function (req, res, next) {
+router.post("/login", validateLogin, async function (req, res, next) {
+    if (res.locals.errors) return res.json({ error: res.locals.errors.details[0].message });
+
     const password = req.body.password;
     const primary = req.body.email ? req.body.email : req.body.phoneNumber;
     console.log(primary);
@@ -44,10 +47,11 @@ router.post("/login", async function (req, res, next) {
  * Authorization required: none
  */
 
-router.post("/register", async function (req, res, next) {
-
+router.post("/register", validateRegister, async function (req, res, next) {
+    if (res.locals.errors) return res.json({ error: res.locals.errors.details[0].message });
     try {
-        const newUser = await Auth.register({ ...req.body });
+        console.log("THIS DA locals data", res.locals.data);
+        const newUser = await Auth.register(res.locals.data);
         const token = Auth.createToken(newUser);
         return res.status(201).json({ token });
     } catch (err) {

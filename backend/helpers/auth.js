@@ -76,6 +76,7 @@ class Auth {
    **/
 
     static async register(userInfo) {
+        console.log(userInfo);
         const duplicateCheck = await prisma.user.findMany({
             where: {
                 email: userInfo.email,
@@ -87,7 +88,7 @@ class Auth {
             BadRequestError('Email or phone number are already registered');
 
         const hashedPassword = await bcrypt.hash(userInfo.password, BCRYPT_WORK_FACTOR);
-
+        console.log("before try");
         try {
             const user = await prisma.user.create({
                 data: {
@@ -103,6 +104,7 @@ class Auth {
             delete user.password;
             return user;
         } catch (err) {
+            console.warn(err);
             throw new BadRequestError("Please fill out required fields");
         }
     }

@@ -8,14 +8,14 @@ datasource db {
 }
 
 model User {
-  isAdmin     Boolean  @default(false) @map("is_admin")
-  createdAt   DateTime @default(now()) @map("created_at")
-  email       String   @id @unique @db.VarChar(64)
-  firstName   String   @map("first_name") @db.VarChar(35)
-  lastName    String   @map("last_name") @db.VarChar(35)
-  lastLogin   DateTime @default(now()) @map("last_login")
+  isAdmin     Boolean   @default(false) @map("is_admin")
+  createdAt   DateTime? @default(now()) @map("created_at")
+  email       String    @id @unique @db.VarChar(64)
+  firstName   String    @map("first_name") @db.VarChar(35)
+  lastName    String    @map("last_name") @db.VarChar(35)
+  lastLogin   DateTime? @default(now()) @map("last_login")
   password    String
-  phoneNumber String?  @unique @map("phone_number") @db.VarChar(10)
+  phoneNumber String?   @unique @map("phone_number") @db.VarChar(10)
   events      Event[]
   matches     Match[]
   profile     Profile?
@@ -24,19 +24,19 @@ model User {
 }
 
 model Profile {
-  email  String   @id @db.VarChar(64)
   age    Int
   bio    String   @db.VarChar(250)
   gender String   @db.VarChar(20)
   traits String[] @db.VarChar(64)
+  email  String   @id @db.VarChar(64)
   user   User     @relation(fields: [email], references: [email], onDelete: Cascade)
 
   @@map("profiles")
 }
 
 model Match {
-  userEmail String @db.VarChar(64)
   eventId   String
+  userEmail String @db.VarChar(64)
   event     Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
   user      User   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
 
@@ -51,8 +51,8 @@ model Event {
   createdAt   DateTime @default(now()) @map("created_at")
   description String   @db.VarChar(250)
   payment     Int?
-  hostEmail   String   @map("host_email") @db.VarChar(64)
   type        String[] @db.VarChar(64)
+  hostEmail   String   @map("host_email") @db.VarChar(64)
   host        User     @relation(fields: [hostEmail], references: [email], onDelete: Cascade)
   Match       Match[]
 
