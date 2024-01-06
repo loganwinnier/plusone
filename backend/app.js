@@ -44,4 +44,4 @@ app.use(function (err, req, res, next) {
     });
 });
 
-module.exports = { app, prisma };
+module.exports = { app };

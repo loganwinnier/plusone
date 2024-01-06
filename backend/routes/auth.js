@@ -5,6 +5,7 @@
 const express = require("express");
 const router = new express.Router();
 const Auth = require("../helpers/auth");
+const { BadRequestError } = require("../expressError");
 
 /** POST /auth/login:  {login , password } => { token }
  * 
@@ -17,11 +18,20 @@ const Auth = require("../helpers/auth");
  */
 
 router.post("/login", async function (req, res, next) {
-    const { login, password } = req.body;
+    const password = req.body.password;
+    const primary = req.body.email ? req.body.email : req.body.phoneNumber;
+    console.log(primary);
+    if (!primary) return res.json({ error: new BadRequestError("email or phone required") });
 
-    const user = await Auth.authenticate(login, password);
-    const token = Auth.createToken(user);
-    return res.json({ token });
+    try {
+        const user = await Auth.authenticate(primary, password);
+        console.log("Authenticated User");
+        const token = Auth.createToken(user);
+        return res.json({ token });
+    } catch (err) {
+        console.error("failed to authenticate", err);
+        return res.json({ error: err });
+    }
 });
 
 
@@ -36,9 +46,13 @@ router.post("/login", async function (req, res, next) {
 
 router.post("/register", async function (req, res, next) {
 
-    const newUser = await Auth.register({ ...req.body });
-    const token = Auth.createToken(newUser);
-    return res.status(201).json({ token });
+    try {
+        const newUser = await Auth.register({ ...req.body });
+        const token = Auth.createToken(newUser);
+        return res.status(201).json({ token });
+    } catch (err) {
+        return res.json({ error: err });
+    }
 });
 
 
