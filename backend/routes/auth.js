@@ -8,6 +8,7 @@ const Auth = require("../helpers/auth");
 const { BadRequestError } = require("../expressError");
 const { validateRegister, validateLogin } = require("../middleware/validation");
 
+
 /** POST /auth/login:  {login , password } => { token }
  * 
  * login is the primary form for auth email/phone-number since optional
